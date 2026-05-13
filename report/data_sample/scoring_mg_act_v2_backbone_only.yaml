@@ -1,0 +1,79 @@
+total: 39.996510958274349
+trial_1:
+  tier_1:
+    score: 1
+    message: Model validation succeeded.
+  tier_2:
+    score: 15.05420626654681
+    message: Scoring succeeded.
+    categories:
+      contacts:
+        score: 0
+        message: No contact detected.
+      duration:
+        score: 3.6938181818181821
+        message: "Task duration: 43.07 seconds."
+      insertion force:
+        score: 0
+        message: No excessive force detected
+      trajectory efficiency:
+        score: 6
+        message: "Total end-effector path length: 0.00 m, initial plug-port distance: 0.13 m"
+      trajectory smoothness:
+        score: 5.3603880847286289
+        message: "Average linear jerk magnitude of the end effector: 5.33 m/s^3"
+  tier_3:
+    score: 24.773042871514907
+    message: "No insertion detected. Final plug port distance: 0.05m."
+trial_2:
+  tier_1:
+    score: 1
+    message: Model validation succeeded.
+  tier_2:
+    score: -5.1403636363636362
+    message: Scoring succeeded.
+    categories:
+      contacts:
+        score: 0
+        message: No contact detected.
+      duration:
+        score: 0.85963636363636309
+        message: "Task duration: 56.06 seconds."
+      insertion force:
+        score: -12
+        message: "Insertion force above 20.00 N, detected for a time of 46.10 seconds. Max detected force: 65.29N. This is above the threshold of 1.00 seconds. Penalty applied."
+      trajectory efficiency:
+        score: 6
+        message: "Total end-effector path length: 0.00 m, initial plug-port distance: 0.04 m"
+      trajectory smoothness:
+        score: 0
+        message: "Average linear jerk magnitude of the end effector: 68.91 m/s^3"
+  tier_3:
+    score: 25
+    message: "No insertion detected. Final plug port distance: 0.03m."
+trial_3:
+  tier_1:
+    score: 1
+    message: Model validation succeeded.
+  tier_2:
+    score: -27.664216007180389
+    message: Scoring succeeded.
+    categories:
+      contacts:
+        score: -24
+        message: Contacts detected (only first reported) between entity named [ur5e::upper_arm_link::upper_arm_link_collision] and [enclosure::enclosure_link::v1015026001_collider_box]. Penalty applied.
+      duration:
+        score: 0
+        message: "Task duration: 65.03 seconds."
+      insertion force:
+        score: -12
+        message: "Insertion force above 20.00 N, detected for a time of 9.69 seconds. Max detected force: 428.15N. This is above the threshold of 1.00 seconds. Penalty applied."
+      trajectory efficiency:
+        score: 6
+        message: "Total end-effector path length: 0.00 m, initial plug-port distance: 0.31 m"
+      trajectory smoothness:
+        score: 2.3357839928196116
+        message: "Average linear jerk magnitude of the end effector: 30.54 m/s^3"
+  tier_3:
+    score: 4.9738414637566661
+    message: "No insertion detected. Final plug port distance: 0.14m."

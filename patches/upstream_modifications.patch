@@ -1,0 +1,117 @@
+diff --git a/.dockerignore b/.dockerignore
+index cdf4d5d..052fc0f 100644
+--- a/.dockerignore
++++ b/.dockerignore
+@@ -1 +1,4 @@
+-.pixi
++.pixi/*
++!.pixi/envs/
++!.pixi/envs/default/
++!.pixi/envs/default/**
+diff --git a/aic_bringup/launch/aic_gz_bringup.launch.py b/aic_bringup/launch/aic_gz_bringup.launch.py
+index 88e489f..6e6a74b 100644
+--- a/aic_bringup/launch/aic_gz_bringup.launch.py
++++ b/aic_bringup/launch/aic_gz_bringup.launch.py
+@@ -204,6 +204,8 @@ def launch_setup(context, *args, **kwargs):
+             "--activate-as-group",
+             "-c",
+             "/controller_manager",
++            "--service-call-timeout",
++            "120",
+         ],
+         condition=IfCondition(activate_joint_controller),
+     )
+@@ -216,6 +218,8 @@ def launch_setup(context, *args, **kwargs):
+             "-c",
+             "/controller_manager",
+             "--inactive",
++            "--service-call-timeout",
++            "120",
+         ],
+         condition=UnlessCondition(activate_joint_controller),
+     )
+diff --git a/docker/aic_model/Dockerfile b/docker/aic_model/Dockerfile
+index 27bcf57..d7335dc 100644
+--- a/docker/aic_model/Dockerfile
++++ b/docker/aic_model/Dockerfile
+@@ -1,28 +1,22 @@
+-FROM docker.io/library/ros:kilted-ros-core AS build
++FROM docker.io/library/ros:kilted-ros-core
+ 
+-# Install pixi
+-RUN apt update && apt install -y git && curl -fsSL https://pixi.sh/install.sh | bash
+-ENV PATH="/root/.pixi/bin:$PATH"
+-
+-# Add base dependencies
+-COPY aic_example_policies /ws_aic/src/aic/aic_example_policies
+-COPY aic_model /ws_aic/src/aic/aic_model
+-COPY aic_interfaces /ws_aic/src/aic/aic_interfaces
+-COPY aic_utils /ws_aic/src/aic/aic_utils
+-COPY pixi.toml pixi.lock /ws_aic/src/aic/
+-COPY pixi_env_setup.sh /ws_aic/src/aic/
+-
+-# Add other dependencies
++# Deadline submission image: reuse the already-tested local pixi environment at
++# its original absolute path, avoiding nondeterministic local package rebuilds.
++COPY .pixi/envs/default /home/ubuntu/ws_aic/src/aic/.pixi/envs/default
++COPY aic_example_policies /home/ubuntu/ws_aic/src/aic/aic_example_policies
++COPY submission_artifacts/mg_act_v2_e20.pt /home/ubuntu/ws_aic/mg_act/mg_act_v2_e20.pt
+ 
++WORKDIR /home/ubuntu/ws_aic/src/aic
+ SHELL ["/bin/bash", "-c"]
+-RUN --mount=type=cache,target=/root/.cache/rattler/cache --mount=type=cache,target=/ws_aic/src/aic/.pixi/build \
+-    cd /ws_aic/src/aic && pixi install --locked
+-
+-WORKDIR /ws_aic/src/aic
+ COPY --chmod=755 <<"EOF" /entrypoint.sh
+ #!/bin/bash
+ set -e
+ 
++ENV_ROOT=/home/ubuntu/ws_aic/src/aic/.pixi/envs/default
++source "$ENV_ROOT/setup.bash"
++export PATH="$ENV_ROOT/bin:$PATH"
++export LD_LIBRARY_PATH="$ENV_ROOT/lib:${LD_LIBRARY_PATH:-}"
++export PYTHONPATH="/home/ubuntu/ws_aic/src/aic/aic_example_policies:$ENV_ROOT/lib/python3.12/site-packages:${PYTHONPATH:-}"
+ export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+ 
+ if [[ -z "$AIC_ROUTER_ADDR" ]]; then
+@@ -53,8 +47,17 @@ if should_enable_acl; then
+ fi
+ export ZENOH_CONFIG_OVERRIDE
+ echo "ZENOH_CONFIG_OVERRIDE=$ZENOH_CONFIG_OVERRIDE"
+-exec pixi run --as-is ros2 run aic_model aic_model "$@"
++exec "$ENV_ROOT/bin/ros2" run aic_model aic_model "$@"
+ EOF
+ 
+ ENTRYPOINT ["/entrypoint.sh"]
+-CMD ["--ros-args", "-p", "policy:=aic_example_policies.ros.CheatCode", "-p", "use_sim_time:=true"]
++ENV AIC_MGACT_CHECKPOINT=/home/ubuntu/ws_aic/mg_act/mg_act_v2_e20.pt
++ENV AIC_MGACT_SUPERVISOR=1
++ENV AIC_MGACT_Z_RATE_APPROACH=0.0005
++ENV AIC_MGACT_Z_RATE_SETTLE=0.00025
++ENV AIC_MGACT_FORCE_MAX=35
++ENV AIC_MGACT_CONTACT_F=25
++ENV AIC_MGACT_FORCE_ABS_MAX=45
++ENV AIC_MGACT_STUCK_STEPS=120
++ENV AIC_MGACT_SETTLE_KZ_MAX=40
++CMD ["--ros-args", "-p", "policy:=aic_example_policies.ros.MgACT", "-p", "use_sim_time:=true"]
+diff --git a/pixi.toml b/pixi.toml
+index de3f361..04946cd 100644
+--- a/pixi.toml
++++ b/pixi.toml
+@@ -35,6 +35,7 @@ ros-kilted-std-msgs = "*"
+ ros-kilted-std-srvs = "*"
+ ros-kilted-tf2-ros-py = "*"
+ setuptools = ">=71.0.0,<81.0.0"                                                        # required by lerobot==0.4.3
++matplotlib = ">=3.10.9,<4"
+ 
+ [pypi-dependencies]
+ huggingface-hub = { version = "~=1.7" }
+@@ -44,6 +45,7 @@ lerobot_teleoperator_devices = { git = "https://github.com/koonpeng/lerobot-ros"
+ mujoco = "==3.5.0"
+ pynput = ">=1.7.6,<2"
+ pyspacemouse = ">=2.0.0, <3"
++h5py = ">=3.16.0, <4"
+ 
+ [activation]
+ scripts = ["pixi_env_setup.sh"]

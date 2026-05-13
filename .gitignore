@@ -1,0 +1,66 @@
+# Large artifacts — not pushed (see REPORT.md for context)
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.hdf5
+*.mcap
+*.bag
+
+# Training/eval outputs
+data/episodes/
+data/episodes_pending_upload/
+data/episodes_terminal_1x/
+data/episodes_terminal_1x_pending_upload/
+data/episodes_terminal_1x_train/
+data/episodes_v2_balanced_0p5/
+data/episodes_v2_balanced_0p5_pending_upload/
+data/logs/
+data/logs_*/
+data/results/
+data/results_*/
+data/latest_*.txt
+
+# Keep ONE sample episode and the scoring yamls (override *.h5 ignore)
+!report/data_sample/
+!report/data_sample/*.h5
+!report/data_sample/*.yaml
+!report/data_sample/*.py
+
+# Generated data-collection trial configs (multi-MB YAMLs)
+aic_*.yaml
+# but keep the smoke test (small, useful as reference)
+!aic_smoke3.yaml
+
+# Python / build
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pixi/
+.pytest_cache/
+build/
+install/
+log/
+.colcon/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Upstream AIC toolkit clone (not our code; we vendor only our edits via policy/ and patches/)
+src/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local credentials (defensive)
+*.pem
+*.key
+.env
+.env.local
+
+# rclone configs
+rclone.conf
+.claude/
