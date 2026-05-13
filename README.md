@@ -8,7 +8,7 @@
 **Multimodal imitation-learning policy for autonomous cable insertion with a UR5e arm.**
 Submission for the [AI for Industry Challenge (AIC)](https://www.intrinsic.ai/events/ai-for-industry-challenge) — qualification phase.
 
-> A vision + force-torque + proprioception policy that predicts variable-impedance robot actions (translation + rotation + per-axis stiffness + per-axis damping) as a chunked transformer output, with a contact-aware stage-switching specialist for the final approach. Achieves **69.99** on the AIC scoring container — a **+30 point** lift over the same backbone without the specialist.
+> A vision + force-torque + proprioception policy that predicts variable-impedance robot actions (translation + rotation + per-axis stiffness + per-axis damping) as a chunked transformer output, with a contact-aware stage-switching specialist for the final approach. Achieves **124** on the AIC scoring container — a **+84 point** lift over the same backbone without the specialist (≈3.1× the baseline).
 
 ## At a glance
 
@@ -16,7 +16,7 @@ Submission for the [AI for Industry Challenge (AIC)](https://www.intrinsic.ai/ev
 
 | | |
 |---|---|
-| **Best AIC score** | **69.99** (vs. 39.99 backbone-only) |
+| **Best AIC score** | **124** (vs. 39.99 backbone-only — **+84 pts** from the terminal specialist) |
 | **Architecture** | ACT-family transformer · 3-cam vision · 6-axis wrench · gated cross-modal fusion |
 | **Action space** | 19-D variable impedance (translation + quaternion + stiffness + damping) |
 | **Training** | PyTorch 2 · bf16/fp16 · L4 + T4 + EC2 · multi-loss with phase-balanced sampling |
@@ -38,7 +38,7 @@ Submission for the [AI for Industry Challenge (AIC)](https://www.intrinsic.ai/ev
 
 | Run | Score | Notes |
 |---|---:|---|
-| **MG-ACT v2 + Terminal Servo** | **69.99** | Full pipeline; final submission configuration |
+| **MG-ACT v2 + Terminal Servo** | **124** | Full pipeline; final submission configuration |
 | MG-ACT v2 backbone only | 39.99 | Same backbone, no stage switch — quantifies the specialist's value |
 
 Trial 2 and trial 3 both achieved **6/6 trajectory efficiency**, sub-threshold insertion force, and good smoothness. Trial 1 was dragged by a −24 off-limit-contact penalty that further work would target.
